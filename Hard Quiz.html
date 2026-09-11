@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML Quiz</title>
+
+```
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        font-family: Arial, sans-serif;
+        background: linear-gradient(135deg, #2563eb, #7c3aed);
+    }
+
+    .quiz-container {
+        width: 100%;
+        max-width: 650px;
+        padding: 30px;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    h1 {
+        text-align: center;
+        color: #2563eb;
+    }
+
+    .quiz-info {
+        display: flex;
+        justify-content: space-between;
+        gap: 15px;
+        margin-bottom: 15px;
+        font-weight: bold;
+    }
+
+    #timer {
+        color: #dc2626;
+    }
+
+    .progress-bar {
+        width: 100%;
+        height: 10px;
+        background: #ddd;
+        border-radius: 10px;
+        margin-bottom: 25px;
+    }
+
+    .progress {
+        height: 100%;
+        width: 10%;
+        background: #2563eb;
+        border-radius: 10px;
+        transition: width 0.3s ease;
+    }
+
+    #question {
+        font-size: 22px;
+    }
+
+    .answer {
+        display: block;
+        width: 100%;
+        padding: 14px;
+        margin: 10px 0;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        background: white;
+        text-align: left;
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+    .answer:hover:not(:disabled) {
+        background: #eef5ff;
+    }
+
+    .correct {
+        background: #c8f7c5 !important;
+        border-color: green;
+    }
+
+    .incorrect {
+        background: #ffcaca !important;
+        border-color: red;
+    }
+
+    #next {
+        width: 100%;
+        padding: 14px;
+        margin-top: 15px;
+        border: none;
+        border-radius: 8px;
+        background: #2563eb;
+        color: white;
+        font-size: 17px;
+        cursor: pointer;
+    }
+
+    #next:disabled {
+        background: #aaa;
+        cursor: not-allowed;
+    }
+
+    #result {
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    .pass {
+        color: green;
+    }
+
+    .fail {
+        color: red;
+    }
+
+    #restart {
+        padding: 12px 25px;
+        border: none;
+        border-radius: 8px;
+        background: #111827;
+        color: white;
+        cursor: pointer;
+    }
+</style>
+```
+
+</head>
+
+<body>
+
+```
+<div class="quiz-container">
+
+    <h1>HTML Quiz</h1>
+
+    <div class="quiz-info">
+        <span id="question-number">Question 1 of 10</span>
+        <span id="score">Score: 0</span>
+        <span id="timer">Time: 05:00</span>
+    </div>
+
+    <div class="progress-bar">
+        <div id="progress" class="progress"></div>
+    </div>
+
+    <h2 id="question"></h2>
+
+    <div id="answers"></div>
+
+    <button id="next" disabled>Next Question</button>
+
+    <div id="result"></div>
+
+</div>
+
+<script>
+    const questionBank = [
+        {
+            question: "What does HTML stand for?",
+            answers: [
+                "Hyper Text Markup Language",
+                "High Text Machine Language",
+                "Home Tool Markup Language",
+                "Hyper Tool Markup Language"
+            ],
+            correct: 0
+        },
+        {
+            question: "Which tag creates a heading?",
+            answers: ["<p>", "<h1>", "<img>", "<a>"],
+            correct: 1
+        },
+        {
+            question: "Which tag displays an image?",
+            answers: ["<image>", "<img>", "<photo>", "<picture>"],
+            correct: 1
+        },
+        {
+            question: "Which tag creates a paragraph?",
+            answers: ["<p>", "<text>", "<para>", "<h2>"],
+            correct: 0
+        },
+        {
+            question: "Which tag creates a link?",
+            answers: ["<a>", "<link>", "<href>", "<url>"],
+            correct: 0
+        },
+        {
+            question: "What does CSS do?",
+            answers: [
+                "Adds style to a webpage",
+                "Creates images",
+                "Stores data",
+                "Plays music"
+            ],
+            correct: 0
+        },
+        {
+            question: "Which tag creates a line break?",
+            answers: ["<br>", "<hr>", "<break>", "<lb>"],
+            correct: 0
+        },
+        {
+            question: "Which tag contains visible webpage content?",
+            answers: ["<body>", "<head>", "<title>", "<meta>"],
+            correct: 0
+        },
+        {
+            question: "Which language makes websites interactive?",
+            answers: ["CSS", "HTML", "JavaScript", "Python"],
+            correct: 2
+        },
+        {
+            question: "Which tag creates a button?",
+            answers: ["<button>", "<btn>", "<click>", "<press>"],
+            correct: 0
+        },
+        {
+            question: "Which tag defines the title shown in the browser tab?",
+            answers: ["<head>", "<title>", "<caption>", "<name>"],
+            correct: 1
+        },
+        {
+            question: "Which attribute provides alternative text for an image?",
+            answers: ["src", "href", "alt", "title"],
+            correct: 2
+        },
+        {
+            question: "Which HTML element creates an unordered list?",
+            answers: ["<ol>", "<ul>", "<li>", "<list>"],
+            correct: 1
+        },
+        {
+            question: "Which tag defines a list item?",
+            answers: ["<item>", "<li>", "<ul>", "<list-item>"],
+            correct: 1
+        },
+        {
+            question: "Which CSS property changes text color?",
+            answers: ["font-color", "text-color", "color", "foreground"],
+            correct: 2
+        },
+        {
+            question: "Which CSS property changes the background color?",
+            answers: ["background-color", "color-background", "bgcolor", "background-style"],
+            correct: 0
+        },
+        {
+            question: "Which symbol is used for an ID selector in CSS?",
+            answers: [".", "#", "*", "&"],
+            correct: 1
+        },
+        {
+            question: "Which symbol is used for a class selector in CSS?",
+            answers: [".", "#", "*", "@"],
+            correct: 0
+        },
+        {
+            question: "Which HTML tag is used to create a table row?",
+            answers: ["<td>", "<th>", "<tr>", "<row>"],
+            correct: 2
+        },
+        {
+            question: "Which HTML tag defines a table cell?",
+            answers: ["<cell>", "<td>", "<tr>", "<table-cell>"],
+            correct: 1
+        },
+        {
+            question: "Which JavaScript keyword declares a constant?",
+            answers: ["var", "let", "const", "constant"],
+            correct: 2
+        },
+        {
+            question: "Which JavaScript method displays a message in the console?",
+            answers: [
+                "console.log()",
+                "print.console()",
+                "message()",
+                "display.log()"
+            ],
+            correct: 0
+        },
+        {
+            question: "Which HTML element is used to create a form?",
+            answers: ["<input>", "<form>", "<fieldset>", "<data>"],
+            correct: 1
+        },
+        {
+            question: "Which input type hides typed characters?",
+            answers: ["text", "hidden", "password", "secure"],
+            correct: 2
+        },
+        {
+            question: "Which CSS property controls the size of text?",
+            answers: ["text-size", "font-size", "size", "font-height"],
+            correct: 1
+        }
+    ];
+
+    let questions = [];
+    let currentQuestion = 0;
+    let score = 0;
+    let answered = false;
+    let timeLeft = 300;
+    let timerInterval = null;
+    let quizFinished = false;
+
+    const questionElement = document.getElementById("question");
+    const answersElement = document.getElementById("answers");
+    const nextButton = document.getElementById("next");
+    const scoreElement = document.getElementById("score");
+    const questionNumberElement = document.getElementById("question-number");
+    const progressElement = document.getElementById("progress");
+    const resultElement = document.getElementById("result");
+    const timerElement = document.getElementById("timer");
+
+    function shuffle(array) {
+        const shuffledArray = [...array];
+
+        for (let i = shuffledArray.length - 1; i > 0; i--) {
+            const randomIndex = Math.floor(Math.random() * (i + 1));
+
+            [shuffledArray[i], shuffledArray[randomIndex]] =
+                [shuffledArray[randomIndex], shuffledArray[i]];
+        }
+
+        return shuffledArray;
+    }
+
+    function createQuizQuestions() {
+        questions = shuffle(questionBank)
+            .slice(0, 10)
+            .map(function(question) {
+                const shuffledAnswers = question.answers.map(function(answer, index) {
+                    return {
+                        text: answer,
+                        isCorrect: index === question.correct
+                    };
+                });
+
+                const randomizedAnswers = shuffle(shuffledAnswers);
+
+                return {
+                    question: question.question,
+                    answers: randomizedAnswers.map(function(answer) {
+                        return answer.text;
+                    }),
+                    correct: randomizedAnswers.findIndex(function(answer) {
+                        return answer.isCorrect;
+                    })
+                };
+            });
+    }
+
+    function updateTimer() {
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+
+        timerElement.textContent =
+            "Time: " +
+            String(minutes).padStart(2, "0") +
+            ":" +
+            String(seconds).padStart(2, "0");
+
+        if (timeLeft <= 30) {
+            timerElement.style.color = "#b91c1c";
+        }
+
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            finishQuiz(true);
+        }
+
+        timeLeft--;
+    }
+
+    function startTimer() {
+        clearInterval(timerInterval);
+        updateTimer();
+
+        timerInterval = setInterval(updateTimer, 1000);
+    }
+
+    function showQuestion() {
+        answered = false;
+        nextButton.disabled = true;
+
+        const question = questions[currentQuestion];
+
+        questionElement.textContent = question.question;
+
+        questionNumberElement.textContent =
+            "Question " +
+            (currentQuestion + 1) +
+            " of " +
+            questions.length;
+
+        scoreElement.textContent = "Score: " + score;
+
+        progressElement.style.width =
+            ((currentQuestion + 1) / questions.length * 100) + "%";
+
+        answersElement.innerHTML = "";
+
+        question.answers.forEach(function(answer, index) {
+            const button = document.createElement("button");
+
+            button.textContent = answer;
+            button.className = "answer";
+
+            button.onclick = function() {
+                if (answered || quizFinished) {
+                    return;
+                }
+
+                answered = true;
+                nextButton.disabled = false;
+
+                const allButtons =
+                    document.querySelectorAll(".answer");
+
+                allButtons.forEach(function(btn) {
+                    btn.disabled = true;
+                });
+
+                if (index === question.correct) {
+                    score++;
+                    button.classList.add("correct");
+                } else {
+                    button.classList.add("incorrect");
+                    allButtons[question.correct].classList.add("correct");
+                }
+
+                scoreElement.textContent = "Score: " + score;
+            };
+
+            answersElement.appendChild(button);
+        });
+    }
+
+    nextButton.onclick = function() {
+        if (!answered || quizFinished) {
+            return;
+        }
+
+        currentQuestion++;
+
+        if (currentQuestion < questions.length) {
+            showQuestion();
+        } else {
+            finishQuiz(false);
+        }
+    };
+
+    function finishQuiz(timeExpired) {
+        if (quizFinished) {
+            return;
+        }
+
+        quizFinished = true;
+        clearInterval(timerInterval);
+
+        questionElement.textContent =
+            timeExpired ? "Time is up!" : "Quiz Finished!";
+
+        answersElement.innerHTML = "";
+        nextButton.style.display = "none";
+
+        questionNumberElement.textContent = "Complete";
+        scoreElement.textContent = "Score: " + score;
+        progressElement.style.width = "100%";
+
+        if (score >= 8) {
+            resultElement.innerHTML = `
+                <h2 class="pass">PASS!</h2>
+                <p>You scored ${score} out of 10.</p>
+                <p>Congratulations! You passed the quiz.</p>
+                <button id="restart">Restart Quiz</button>
+            `;
+        } else {
+            resultElement.innerHTML = `
+                <h2 class="fail">FAIL</h2>
+                <p>You scored ${score} out of 10.</p>
+                <p>You need at least 8 correct answers to pass.</p>
+                <button id="restart">Restart Quiz</button>
+            `;
+        }
+
+        document.getElementById("restart").onclick = restartQuiz;
+    }
+
+    function restartQuiz() {
+        currentQuestion = 0;
+        score = 0;
+        answered = false;
+        quizFinished = false;
+        timeLeft = 300;
+
+        timerElement.style.color = "#dc2626";
+        resultElement.innerHTML = "";
+        nextButton.style.display = "block";
+
+        createQuizQuestions();
+        showQuestion();
+        startTimer();
+    }
+
+    restartQuiz();
+</script>
+```
+
+</body>
+</html>
